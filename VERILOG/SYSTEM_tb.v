@@ -1,0 +1,192 @@
+`timescale 1 ns / 100 ps
+
+module SYSTEM_tb;
+reg iClk;
+reg rst_n;
+reg en;
+wire oDONE;
+wire [31:0] oBIN1, oBIN2, oBIN3, oBIN4, oBIN5, oBIN6, oBIN7, oBIN8, oBIN9;
+
+`define PAT        "./InDataPosMEM.txt"  
+`define PREPAT        "./TrainedDataMEM.txt"  
+parameter N_PAT   = 8580; // 130 x 66 pixels
+parameter N_PREPAT = 3780; // 3780 trained values.
+reg   [7:0]  mem [0:N_PAT-1];
+reg [31:0] trained_value_buffer [0:N_PREPAT - 1];
+initial	$readmemh (`PAT, mem);
+initial	$readmemh (`PREPAT, trained_value_buffer);
+
+initial begin 
+  #5 rst_n = 0;
+  #75 rst_n = 1;
+end
+initial begin 
+  #5 iClk = 0;
+end
+always begin 
+  #10 iClk = !iClk;
+end
+initial begin
+  #10; en = 1'b0;
+  #50; en = 1'b1;
+end
+
+
+wire [6:0] out;
+wire stop_flag;
+Counter_Cell Counter_Cell(.iClk(iClk), .iRst_n(rst_n), .iEn(en), .oOut(out));
+  
+wire [13:0] beginROW;
+wire [6:0] beginCOL;
+PreDecoderAddrCell PreDecoderAddrCell(.iNumOrder(out), .oBeginRow(beginROW), .oBeginCol(beginCOL));
+        
+wire [13:0] oADDR_PX11, oADDR_PX12, oADDR_PX13, oADDR_PX14, oADDR_PX15, oADDR_PX16, oADDR_PX17, oADDR_PX18, oADDR_PX19, oADDR_PX1_10; 
+wire [13:0] oADDR_PX21, oADDR_PX22, oADDR_PX23, oADDR_PX24, oADDR_PX25, oADDR_PX26, oADDR_PX27, oADDR_PX28, oADDR_PX29, oADDR_PX2_10; 
+wire [13:0] oADDR_PX31, oADDR_PX32, oADDR_PX33, oADDR_PX34, oADDR_PX35, oADDR_PX36, oADDR_PX37, oADDR_PX38, oADDR_PX39, oADDR_PX3_10; 
+wire [13:0] oADDR_PX41, oADDR_PX42, oADDR_PX43, oADDR_PX44, oADDR_PX45, oADDR_PX46, oADDR_PX47, oADDR_PX48, oADDR_PX49, oADDR_PX4_10; 
+wire [13:0] oADDR_PX51, oADDR_PX52, oADDR_PX53, oADDR_PX54, oADDR_PX55, oADDR_PX56, oADDR_PX57, oADDR_PX58, oADDR_PX59, oADDR_PX5_10; 
+wire [13:0] oADDR_PX61, oADDR_PX62, oADDR_PX63, oADDR_PX64, oADDR_PX65, oADDR_PX66, oADDR_PX67, oADDR_PX68, oADDR_PX69, oADDR_PX6_10; 
+wire [13:0] oADDR_PX71, oADDR_PX72, oADDR_PX73, oADDR_PX74, oADDR_PX75, oADDR_PX76, oADDR_PX77, oADDR_PX78, oADDR_PX79, oADDR_PX7_10; 
+wire [13:0] oADDR_PX81, oADDR_PX82, oADDR_PX83, oADDR_PX84, oADDR_PX85, oADDR_PX86, oADDR_PX87, oADDR_PX88, oADDR_PX89, oADDR_PX8_10; 
+wire [13:0] oADDR_PX91, oADDR_PX92, oADDR_PX93, oADDR_PX94, oADDR_PX95, oADDR_PX96, oADDR_PX97, oADDR_PX98, oADDR_PX99, oADDR_PX9_10; 
+wire [13:0] oADDR_PX10_1, oADDR_PX10_2, oADDR_PX10_3, oADDR_PX10_4, oADDR_PX10_5, oADDR_PX10_6, oADDR_PX10_7, oADDR_PX10_8, oADDR_PX10_9, oADDR_PX10_10;
+
+DecoderAddrCell DecoderAddrCell(.iBEGIN_ROW(beginROW), .iBEGIN_COL(beginCOL),
+    
+      .oADDR_PX11(oADDR_PX11), .oADDR_PX12(oADDR_PX12), .oADDR_PX13(oADDR_PX13), .oADDR_PX14(oADDR_PX14), .oADDR_PX15(oADDR_PX15), 
+      .oADDR_PX16(oADDR_PX16), .oADDR_PX17(oADDR_PX17), .oADDR_PX18(oADDR_PX18), .oADDR_PX19(oADDR_PX19), .oADDR_PX1_10(oADDR_PX1_10), 
+      
+      .oADDR_PX21(oADDR_PX21), .oADDR_PX22(oADDR_PX22), .oADDR_PX23(oADDR_PX23), .oADDR_PX24(oADDR_PX24), .oADDR_PX25(oADDR_PX25), 
+      .oADDR_PX26(oADDR_PX26), .oADDR_PX27(oADDR_PX27), .oADDR_PX28(oADDR_PX28), .oADDR_PX29(oADDR_PX29), .oADDR_PX2_10(oADDR_PX2_10), 
+      
+      .oADDR_PX31(oADDR_PX31), .oADDR_PX32(oADDR_PX32), .oADDR_PX33(oADDR_PX33), .oADDR_PX34(oADDR_PX34), .oADDR_PX35(oADDR_PX35), 
+      .oADDR_PX36(oADDR_PX36), .oADDR_PX37(oADDR_PX37), .oADDR_PX38(oADDR_PX38), .oADDR_PX39(oADDR_PX39), .oADDR_PX3_10(oADDR_PX3_10), 
+      
+      .oADDR_PX41(oADDR_PX41), .oADDR_PX42(oADDR_PX42), .oADDR_PX43(oADDR_PX43), .oADDR_PX44(oADDR_PX44), .oADDR_PX45(oADDR_PX45), 
+      .oADDR_PX46(oADDR_PX46), .oADDR_PX47(oADDR_PX47), .oADDR_PX48(oADDR_PX48), .oADDR_PX49(oADDR_PX49), .oADDR_PX4_10(oADDR_PX4_10), 
+      
+      .oADDR_PX51(oADDR_PX51), .oADDR_PX52(oADDR_PX52), .oADDR_PX53(oADDR_PX53), .oADDR_PX54(oADDR_PX54), .oADDR_PX55(oADDR_PX55), 
+      .oADDR_PX56(oADDR_PX56), .oADDR_PX57(oADDR_PX57), .oADDR_PX58(oADDR_PX58), .oADDR_PX59(oADDR_PX59), .oADDR_PX5_10(oADDR_PX5_10), 
+      
+      .oADDR_PX61(oADDR_PX61), .oADDR_PX62(oADDR_PX62), .oADDR_PX63(oADDR_PX63), .oADDR_PX64(oADDR_PX64), .oADDR_PX65(oADDR_PX65), 
+      .oADDR_PX66(oADDR_PX66), .oADDR_PX67(oADDR_PX67), .oADDR_PX68(oADDR_PX68), .oADDR_PX69(oADDR_PX69), .oADDR_PX6_10(oADDR_PX6_10), 
+      
+      .oADDR_PX71(oADDR_PX71), .oADDR_PX72(oADDR_PX72), .oADDR_PX73(oADDR_PX73), .oADDR_PX74(oADDR_PX74), .oADDR_PX75(oADDR_PX75), 
+      .oADDR_PX76(oADDR_PX76), .oADDR_PX77(oADDR_PX77), .oADDR_PX78(oADDR_PX78), .oADDR_PX79(oADDR_PX79), .oADDR_PX7_10(oADDR_PX7_10), 
+      
+      .oADDR_PX81(oADDR_PX81), .oADDR_PX82(oADDR_PX82), .oADDR_PX83(oADDR_PX83), .oADDR_PX84(oADDR_PX84), .oADDR_PX85(oADDR_PX85), 
+      .oADDR_PX86(oADDR_PX86), .oADDR_PX87(oADDR_PX87), .oADDR_PX88(oADDR_PX88), .oADDR_PX89(oADDR_PX89), .oADDR_PX8_10(oADDR_PX8_10), 
+      
+      .oADDR_PX91(oADDR_PX91), .oADDR_PX92(oADDR_PX92), .oADDR_PX93(oADDR_PX93), .oADDR_PX94(oADDR_PX94), .oADDR_PX95(oADDR_PX95), 
+      .oADDR_PX96(oADDR_PX96), .oADDR_PX97(oADDR_PX97), .oADDR_PX98(oADDR_PX98), .oADDR_PX99(oADDR_PX99), .oADDR_PX9_10(oADDR_PX9_10),
+      
+      .oADDR_PX10_1(oADDR_PX10_1), .oADDR_PX10_2(oADDR_PX10_2), .oADDR_PX10_3(oADDR_PX10_3), .oADDR_PX10_4(oADDR_PX10_4), .oADDR_PX10_5(oADDR_PX10_5), 
+      .oADDR_PX10_6(oADDR_PX10_6), .oADDR_PX10_7(oADDR_PX10_7), .oADDR_PX10_8(oADDR_PX10_8), .oADDR_PX10_9(oADDR_PX10_9), .oADDR_PX10_10(oADDR_PX10_10) 
+
+);
+
+wire oDONE_FLAG;
+HISTOGRAM_1CELL_PRENORM HISTOGRAM_1CELL_PRENORM(.iClk(iClk), .iRst_n(rst_n),
+
+	.iPX11(mem[oADDR_PX11]), .iPX12(mem[oADDR_PX12]), .iPX13(mem[oADDR_PX13]), .iPX14(mem[oADDR_PX14]), .iPX15(mem[oADDR_PX15]), 
+	.iPX16(mem[oADDR_PX16]), .iPX17(mem[oADDR_PX17]), .iPX18(mem[oADDR_PX18]), .iPX19(mem[oADDR_PX19]), .iPX1_10(mem[oADDR_PX1_10]), 
+	
+	.iPX21(mem[oADDR_PX21]), .iPX22(mem[oADDR_PX22]), .iPX23(mem[oADDR_PX23]), .iPX24(mem[oADDR_PX24]), .iPX25(mem[oADDR_PX25]), 
+	.iPX26(mem[oADDR_PX26]), .iPX27(mem[oADDR_PX27]), .iPX28(mem[oADDR_PX28]), .iPX29(mem[oADDR_PX29]), .iPX2_10(mem[oADDR_PX2_10]), 
+	
+	.iPX31(mem[oADDR_PX31]), .iPX32(mem[oADDR_PX32]), .iPX33(mem[oADDR_PX33]), .iPX34(mem[oADDR_PX34]), .iPX35(mem[oADDR_PX35]), 
+	.iPX36(mem[oADDR_PX36]), .iPX37(mem[oADDR_PX37]), .iPX38(mem[oADDR_PX38]), .iPX39(mem[oADDR_PX39]), .iPX3_10(mem[oADDR_PX3_10]),
+	
+	.iPX41(mem[oADDR_PX41]), .iPX42(mem[oADDR_PX42]), .iPX43(mem[oADDR_PX43]), .iPX44(mem[oADDR_PX44]), .iPX45(mem[oADDR_PX45]), 
+	.iPX46(mem[oADDR_PX46]), .iPX47(mem[oADDR_PX47]), .iPX48(mem[oADDR_PX48]), .iPX49(mem[oADDR_PX49]), .iPX4_10(mem[oADDR_PX4_10]),
+	
+	.iPX51(mem[oADDR_PX51]), .iPX52(mem[oADDR_PX52]), .iPX53(mem[oADDR_PX53]), .iPX54(mem[oADDR_PX54]), .iPX55(mem[oADDR_PX55]), 
+	.iPX56(mem[oADDR_PX56]), .iPX57(mem[oADDR_PX57]), .iPX58(mem[oADDR_PX58]), .iPX59(mem[oADDR_PX59]), .iPX5_10(mem[oADDR_PX5_10]),
+	
+	.iPX61(mem[oADDR_PX61]), .iPX62(mem[oADDR_PX62]), .iPX63(mem[oADDR_PX63]), .iPX64(mem[oADDR_PX64]), .iPX65(mem[oADDR_PX65]), 
+	.iPX66(mem[oADDR_PX66]), .iPX67(mem[oADDR_PX67]), .iPX68(mem[oADDR_PX68]), .iPX69(mem[oADDR_PX69]), .iPX6_10(mem[oADDR_PX6_10]),
+	
+	.iPX71(mem[oADDR_PX71]), .iPX72(mem[oADDR_PX72]), .iPX73(mem[oADDR_PX73]), .iPX74(mem[oADDR_PX74]), .iPX75(mem[oADDR_PX75]), 
+	.iPX76(mem[oADDR_PX76]), .iPX77(mem[oADDR_PX77]), .iPX78(mem[oADDR_PX78]), .iPX79(mem[oADDR_PX79]), .iPX7_10(mem[oADDR_PX7_10]),
+	
+	.iPX81(mem[oADDR_PX81]), .iPX82(mem[oADDR_PX82]), .iPX83(mem[oADDR_PX83]), .iPX84(mem[oADDR_PX84]), .iPX85(mem[oADDR_PX85]), 
+	.iPX86(mem[oADDR_PX86]), .iPX87(mem[oADDR_PX87]), .iPX88(mem[oADDR_PX88]), .iPX89(mem[oADDR_PX89]), .iPX8_10(mem[oADDR_PX8_10]),
+	
+	.iPX91(mem[oADDR_PX91]), .iPX92(mem[oADDR_PX92]), .iPX93(mem[oADDR_PX93]), .iPX94(mem[oADDR_PX94]), .iPX95(mem[oADDR_PX95]), 
+	.iPX96(mem[oADDR_PX96]), .iPX97(mem[oADDR_PX97]), .iPX98(mem[oADDR_PX98]), .iPX99(mem[oADDR_PX99]), .iPX9_10(mem[oADDR_PX9_10]),
+	
+	.iPX10_1(mem[oADDR_PX10_1]), .iPX10_2(mem[oADDR_PX10_2]), .iPX10_3(mem[oADDR_PX10_3]), .iPX10_4(mem[oADDR_PX10_4]), .iPX10_5(mem[oADDR_PX10_5]), 
+	.iPX10_6(mem[oADDR_PX10_6]), .iPX10_7(mem[oADDR_PX10_7]), .iPX10_8(mem[oADDR_PX10_8]), .iPX10_9(mem[oADDR_PX10_9]), .iPX10_10(mem[oADDR_PX10_10]),
+	
+	
+	.oBIN1(oBIN1), .oBIN2(oBIN2), .oBIN3(oBIN3), .oBIN4(oBIN4), .oBIN5(oBIN5), .oBIN6(oBIN6), .oBIN7(oBIN7), .oBIN8(oBIN8), .oBIN9(oBIN9),
+	.oDONE(oDONE_FLAG)
+
+  );
+  
+	wire [31:0] oBIN11, oBIN12, oBIN13, oBIN14, oBIN15, oBIN16, oBIN17, oBIN18, oBIN19;
+	wire [31:0] oBIN21, oBIN22, oBIN23, oBIN24, oBIN25, oBIN26, oBIN27, oBIN28, oBIN29;
+	wire [31:0] oBIN31, oBIN32, oBIN33, oBIN34, oBIN35, oBIN36, oBIN37, oBIN38, oBIN39;
+	wire [31:0] oBIN41, oBIN42, oBIN43, oBIN44, oBIN45, oBIN46, oBIN47, oBIN48, oBIN49;
+  
+  BUFFER_HOG_PRENORM BUFFER_HOG_PRENORM(.iClk(iClk), .iWR(oDONE_FLAG), .iRst_n(rst_n),
+  
+	.iBIN1(oBIN1), .iBIN2(oBIN2), .iBIN3(oBIN3), .iBIN4(oBIN4), .iBIN5(oBIN5), .iBIN6(oBIN6), .iBIN7(oBIN7), .iBIN8(oBIN8), .iBIN9(oBIN9),
+
+	.oBIN11(oBIN11), .oBIN12(oBIN12), .oBIN13(oBIN13), .oBIN14(oBIN14), .oBIN15(oBIN15), .oBIN16(oBIN16), .oBIN17(oBIN17), .oBIN18(oBIN18), .oBIN19(oBIN19),
+	.oBIN21(oBIN21), .oBIN22(oBIN22), .oBIN23(oBIN23), .oBIN24(oBIN24), .oBIN25(oBIN25), .oBIN26(oBIN26), .oBIN27(oBIN27), .oBIN28(oBIN28), .oBIN29(oBIN29),
+	.oBIN31(oBIN31), .oBIN32(oBIN32), .oBIN33(oBIN33), .oBIN34(oBIN34), .oBIN35(oBIN35), .oBIN36(oBIN36), .oBIN37(oBIN37), .oBIN38(oBIN38), .oBIN39(oBIN39),
+	.oBIN41(oBIN41), .oBIN42(oBIN42), .oBIN43(oBIN43), .oBIN44(oBIN44), .oBIN45(oBIN45), .oBIN46(oBIN46), .oBIN47(oBIN47), .oBIN48(oBIN48), .oBIN49(oBIN49),
+
+	.oDONE(oDONE)
+);
+
+	wire [31:0] oNormBIN11, oNormBIN12, oNormBIN13, oNormBIN14, oNormBIN15, oNormBIN16, oNormBIN17, oNormBIN18, oNormBIN19;
+	wire [31:0] oNormBIN21, oNormBIN22, oNormBIN23, oNormBIN24, oNormBIN25, oNormBIN26, oNormBIN27, oNormBIN28, oNormBIN29;
+	wire [31:0] oNormBIN31, oNormBIN32, oNormBIN33, oNormBIN34, oNormBIN35, oNormBIN36, oNormBIN37, oNormBIN38, oNormBIN39;
+	wire [31:0] oNormBIN41, oNormBIN42, oNormBIN43, oNormBIN44, oNormBIN45, oNormBIN46, oNormBIN47, oNormBIN48, oNormBIN49;
+	wire normDONE;
+
+BLOCK_NORMALIZATION BLOCK_NORMALIZATION(.iClk(iClk), .iReady(oDONE),
+	.iBIN11(oBIN11), .iBIN12(oBIN12), .iBIN13(oBIN13), .iBIN14(oBIN14), .iBIN15(oBIN15), .iBIN16(oBIN16), .iBIN17(oBIN17), .iBIN18(oBIN18), .iBIN19(oBIN19),
+	.iBIN21(oBIN21), .iBIN22(oBIN22), .iBIN23(oBIN23), .iBIN24(oBIN24), .iBIN25(oBIN25), .iBIN26(oBIN26), .iBIN27(oBIN27), .iBIN28(oBIN28), .iBIN29(oBIN29),
+	.iBIN31(oBIN31), .iBIN32(oBIN32), .iBIN33(oBIN33), .iBIN34(oBIN34), .iBIN35(oBIN35), .iBIN36(oBIN36), .iBIN37(oBIN37), .iBIN38(oBIN38), .iBIN39(oBIN39),
+	.iBIN41(oBIN41), .iBIN42(oBIN42), .iBIN43(oBIN43), .iBIN44(oBIN44), .iBIN45(oBIN45), .iBIN46(oBIN46), .iBIN47(oBIN47), .iBIN48(oBIN48), .iBIN49(oBIN49),
+
+	.oBIN11(oNormBIN11), .oBIN12(oNormBIN12), .oBIN13(oNormBIN13), .oBIN14(oNormBIN14), .oBIN15(oNormBIN15), .oBIN16(oNormBIN16), .oBIN17(oNormBIN17), .oBIN18(oNormBIN18), .oBIN19(oNormBIN19),
+	.oBIN21(oNormBIN21), .oBIN22(oNormBIN22), .oBIN23(oNormBIN23), .oBIN24(oNormBIN24), .oBIN25(oNormBIN25), .oBIN26(oNormBIN26), .oBIN27(oNormBIN27), .oBIN28(oNormBIN28), .oBIN29(oNormBIN29),
+	.oBIN31(oNormBIN31), .oBIN32(oNormBIN32), .oBIN33(oNormBIN33), .oBIN34(oNormBIN34), .oBIN35(oNormBIN35), .oBIN36(oNormBIN36), .oBIN37(oNormBIN37), .oBIN38(oNormBIN38), .oBIN39(oNormBIN39),
+	.oBIN41(oNormBIN41), .oBIN42(oNormBIN42), .oBIN43(oNormBIN43), .oBIN44(oNormBIN44), .oBIN45(oNormBIN45), .oBIN46(oNormBIN46), .oBIN47(oNormBIN47), .oBIN48(oNormBIN48), .oBIN49(oNormBIN49),
+	
+	.oDONE(normDONE)
+
+);
+wire addr_hog_DONE;
+wire [11:0] addr_hog_value;
+wire buffer_hog_DONE;
+ADDR_FOR_SVM ADDR_FOR_SVM(.iClk(iClk), .iReady(buffer_hog_DONE), .oADDR(addr_hog_value), .oDONE(addr_hog_DONE));
+
+
+wire [31:0] oHOG_Value;
+
+BUFFER_HOG BUFFER_HOG(.iClk(iClk), .iRst_n(rst_n), .iWR(normDONE), .iADDR(addr_hog_value),
+  .iBIN11(oNormBIN11), .iBIN12(oNormBIN12), .iBIN13(oNormBIN13), .iBIN14(oNormBIN14), .iBIN15(oNormBIN15), .iBIN16(oNormBIN16), .iBIN17(oNormBIN17), .iBIN18(oNormBIN18), .iBIN19(oNormBIN19),
+  .iBIN21(oNormBIN21), .iBIN22(oNormBIN22), .iBIN23(oNormBIN23), .iBIN24(oNormBIN24), .iBIN25(oNormBIN25), .iBIN26(oNormBIN26), .iBIN27(oNormBIN27), .iBIN28(oNormBIN28), .iBIN29(oNormBIN29),
+  .iBIN31(oNormBIN31), .iBIN32(oNormBIN32), .iBIN33(oNormBIN33), .iBIN34(oNormBIN34), .iBIN35(oNormBIN35), .iBIN36(oNormBIN36), .iBIN37(oNormBIN37), .iBIN38(oNormBIN38), .iBIN39(oNormBIN39),
+  .iBIN41(oNormBIN41), .iBIN42(oNormBIN42), .iBIN43(oNormBIN43), .iBIN44(oNormBIN44), .iBIN45(oNormBIN45), .iBIN46(oNormBIN46), .iBIN47(oNormBIN47), .iBIN48(oNormBIN48), .iBIN49(oNormBIN49),
+	 
+  .oValue(oHOG_Value),
+  .oDONE(buffer_hog_DONE)
+
+);
+
+wire isHUMAN;
+wire oFINISH;
+SVMCLASSIFY SVMCLASSIFY(.iClk(iClk), .iReady(buffer_hog_DONE), .iRst_n(rst_n), .iDone(addr_hog_DONE), .iHOG_Value(oHOG_Value),
+                        .iTrained_Value(trained_value_buffer[addr_hog_value]), .oHUMAN(isHUMAN), .oFINISH(oFINISH));
+
+always @ (posedge oFINISH )begin 
+   $finish;
+end
+
+endmodule
