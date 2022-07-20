@@ -81,7 +81,7 @@ GroupSet = zeros(length(testSet), 1);
 
 targetLabels = [ones(length(testPos), 1); zeros(length(testNeg), 1)];
 
-CAM = zeros(length(testSet), 1);
+feature = zeros(length(testSet), 1);
 RESULT = zeros(length(testSet), 1);
 GroupLabels = zeros(length(testSet), 1);
 GroupScores = zeros(length(testSet), 1);
@@ -149,8 +149,8 @@ fprintf('(%d / %d) %.2f%%\n', (length(testSet) - error), length(testSet), (lengt
 % G = svmclassify(SVMStruct, hog_pos');
  %J = svmclassify(SVMStruct, hog_neg');
  % testing 
- KETQUA_pos = hog_pos' * SVMModel.Beta + SVMModel.Bias;
- KETQUA_neg = hog_neg' * SVMModel.Beta + SVMModel.Bias;
+ result_pos = hog_pos' * SVMModel.Beta + SVMModel.Bias;
+ result_neg = hog_neg' * SVMModel.Beta + SVMModel.Bias;
 tic;
 [labelPos,scorePos] = predict(SVMModel,hog_pos');
 Treg = toc;
